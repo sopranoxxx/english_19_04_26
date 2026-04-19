@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vocabulary Gap Trainer – Station 1–3</title>
+  <style>
+    body {
+      font-family: -apple-system, system-ui, Arial, sans-serif;
+      margin: 16px;
+      color: #111;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 8px;
+    }
+    p {
+      color: #555;
+      line-height: 1.4;
+      margin: 6px 0 12px;
+    }
+    .card {
+      margin-top: 14px;
+      padding: 14px;
+      border: 1px solid #eee;
+      border-radius: 12px;
+    }
+    .toprow {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .mini {
+      font-size: 13px;
+      color: #666;
+    }
+    .barwrap {
+      width: 100%;
+      height: 10px;
+      border: 1px solid #ddd;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #fff;
+      margin: 8px 0 14px;
+    }
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: #2a7;
+    }
+    .deword {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 8px 0 12px;
+    }
+    .sentence {
+      font-size: 20px;
+      line-height: 1.45;
+      margin-top: 8px;
+    }
+    .subq {
+      margin-top: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+    .hintbox {
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px dashed #ccc;
+      border-radius: 10px;
+      background: #fcfcfc;
+      color: #333;
+    }
+    input {
+      font-size: 17px;
+      padding: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+    button {
+      font-size: 16px;
+      padding: 10px 12px;
+      margin-top: 10px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .row button {
+      flex: 1;
+      min-width: 150px;
+    }
+    .ok {
+      color: #0a7a0a;
+      font-weight: 700;
+    }
+    .bad {
+      color: #b00020;
+      font-weight: 700;
+    }
+    .muted {
+      color: #666;
+    }
+    .warn {
+      background: #fff7e6;
+      border: 1px solid #ffe0a3;
+      padding: 10px;
+      border-radius: 10px;
+      color: #5b3b00;
+      margin-top: 10px;
+    }
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      font-size: 12px;
+      margin-left: 8px;
+    }
+    .status {
+      margin-top: 12px;
+      white-space: pre-wrap;
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 13px;
+    }
+    details {
+      margin-top: 10px;
+    }
+    details summary {
+      cursor: pointer;
+      user-select: none;
+    }
+    .bankitem {
+      margin: 4px 0;
+      line-height: 1.35;
+    }
+    .smallbtn {
+      font-size: 14px;
+      padding: 8px 10px;
+    }
+    noscript {
+      display: block;
+      margin-top: 10px;
+      padding: 10px;
+      border: 1px solid #d00;
+      border-radius: 10px;
+      color: #700;
+    }
+  </style>
+</head>
+<body>
+  <h1>Vocabulary Gap Trainer – Station 1–3</h1>
+  <p>
+    Du siehst ein <b>deutsches Wort</b> und einen <b>englischen Beispielsatz mit Lücke</b>.
+    Schreibe das passende <b>englische Wort</b> in die Lücke.
+    <br>
+    Fehlerhafte Aufgaben kommen <b>erst nach mindestens 5 weiteren Fragen</b> wieder.
+    Fortschritt wird im Browser gespeichert.
+  </p>
+
+  <noscript>
+    JavaScript ist deaktiviert. Bitte diese Seite in einem Browser öffnen, der JavaScript erlaubt.
+  </noscript>
+
+  <div class="card">
+    <div class="toprow">
+      <div class="mini" id="progressText">Fortschritt: 0%</div>
+      <div class="mini" id="progressNums"></div>
+      <div class="mini" id="reviewinfo"></div>
+      <div class="mini" id="qnum"></div>
+    </div>
+
+    <div class="barwrap">
+      <div class="bar" id="bar"></div>
+    </div>
+
+    <div class="deword" id="deword">Lade Wort…</div>
+    <div class="sentence" id="sentence">Lade Satz…</div>
+    <div class="subq" id="subq"></div>
+
+    <div class="hintbox" id="hintBox">
+      Schreibe das fehlende englische Wort oder die fehlende englische Wendung genau in der passenden Form.
+    </div>
+
+    <input id="answer" placeholder="Englisches Wort hier eingeben" autocomplete="off" />
+
+    <div class="row">
+      <button id="btnCheck" type="button">✅ Prüfen</button>
+      <button id="btnShow" type="button">👁️ Lösung zeigen</button>
+    </div>
+
+    <div class="row">
+      <button id="btnNext" type="button" disabled>➡️ Nächste Frage</button>
+      <button id="btnSkip" type="button">⏭️ Überspringen</button>
+    </div>
+
+    <div id="feedback" style="margin-top:10px;"></div>
+
+    <details>
+      <summary>📚 Word Bank anzeigen</summary>
+      <div class="hintbox" id="bankBox"></div>
+    </details>
+
+    <div class="row">
+      <button id="btnStatus" class="smallbtn" type="button">📊 Status</button>
+      <button id="btnRestart" class="smallbtn" type="button">🔄 Reset</button>
+    </div>
+
+    <div class="status" id="status"></div>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const ITEMS = [
+    // Station 1
+    { id: 1, de: "Meerschweinchen", answer: "guinea pig", sentence: "I don't want a ________. They're too small.", note: "Station 1" },
+    { id: 2, de: "nonstop; ununterbrochen", answer: "nonstop", sentence: "You're telling me ________ what you don't want, but I still don't know what you want.", note: "Station 1" },
+    { id: 3, de: "verbringen (Zeit)", answer: "spend", sentence: "A lot of teenagers ________ their free time on social media.", note: "Station 1" },
+    { id: 4, de: "mein/-er/-e/-es", answer: "mine", sentence: "Hey, don't take that phone. It's ________.", note: "Station 1" },
+    { id: 5, de: "ausführen; spazieren gehen", answer: "take", sentence: "My grandparents often ________ our dog for a walk.", note: "Station 1" },
+    { id: 6, de: "flaumig; flauschig; flockig", answer: "fluffy", sentence: "Your jumper is so ________. Is it new?", note: "Station 1" },
+    { id: 7, de: "bis jetzt", answer: "so far", sentence: "The artists have given the people a great show ________.", note: "Station 1" },
+    { id: 8, de: "verletzen; wehtun", answer: "hurt", sentence: "I ________ my leg last month, and it still hurts to walk.", note: "Station 1" },
+    { id: 9, de: "Jugendliche/-r; Kind", answer: "kids", sentence: "Those ________ over there live in my street.", note: "Station 1" },
+    { id: 10, de: "Arzt/Ärztin", answer: "doctor", sentence: "Your foot still hurts? Have you seen a ________ yet?", note: "Station 1" },
+    { id: 11, de: "besuchen", answer: "see", sentence: "Come and ________ me later today, I've just made the best muffins!", note: "Station 1" },
+    { id: 12, de: "Filmemacher/-in", answer: "filmmaker", sentence: "A ________ makes films.", note: "Station 1" },
+    { id: 13, de: "heißen; genannt werden", answer: "called", sentence: "What's your sister ________? – Her name is Ally.", note: "Station 1" },
+    { id: 14, de: "audiovisueller Effekt", answer: "audio-visual effects", sentence: "A lot of films about space have great ________, so I like to see films like that in the cinema, not at home.", note: "Station 1" },
+    { id: 15, de: "Atmosphäre; Stimmung", answer: "atmosphere", sentence: "In a film you can create different kinds of ________ with music.", note: "Station 1" },
+    { id: 16, de: "laut", answer: "loud", sentence: "I like music best when it's ________.", note: "Station 1" },
+
+    // Station 2
+    { id: 17, de: "jemals", answer: "ever", sentence: "Ruby, have you ________ tidied your room? – No, never.", note: "Station 2" },
+    { id: 18, de: "berühren; anfassen; antippen", answer: "touch", sentence: "Don't ________ the dog. He doesn't like it.", note: "Station 2" },
+    { id: 19, de: "Tarantel (Spinnenart)", answer: "Tarantulas", sentence: "________ aren't as scary as they look. – Are you sure?", note: "Station 2" },
+    { id: 20, de: "hilfsbereit; hilfreich", answer: "helpful", sentence: "Thank you for your help. This information is really ________.", note: "Station 2" },
+    { id: 21, de: "wie man ...", answer: "how to", sentence: "Do you know ________ make a real American burger?", note: "Station 2" },
+    { id: 22, de: "Ägypter/-in; ägyptisch", answer: "Egyptian", sentence: "Some parts of ________ culture are very, very old.", note: "Station 2" },
+    { id: 23, de: "Spinne", answer: "spiders", sentence: "I'm not scared of ________. Are you?", note: "Station 2" },
+    { id: 24, de: "nennen", answer: "call", sentence: "My name is Elizabeth, but you can ________ me Lizzy.", note: "Station 2" },
+    { id: 25, de: "privat", answer: "private", sentence: "Never post ________ information on social media.", note: "Station 2" },
+    { id: 26, de: "Haarschnitt", answer: "haircut", sentence: "Wow, I like your new ________!", note: "Station 2" },
+    { id: 27, de: "Drehbuch; Skript", answer: "script", sentence: "Before you start to make a film, you need a ________.", note: "Station 2" },
+
+    // Station 2 / 3 top page
+    { id: 28, de: "filmen; drehen", answer: "film", sentence: "It's bad weather today, so let's ________ the last scene tomorrow.", note: "Station 2/3" },
+    { id: 29, de: "hier: Leckerli; Belohnung", answer: "treat", sentence: "A ________ is often something good to eat.", note: "Station 2/3" },
+    { id: 30, de: "kommentieren", answer: "comment on", sentence: "I never ________ posts.", note: "Station 2/3" },
+    { id: 31, de: "vorbereiten; zubereiten", answer: "prepared", sentence: "Have you ________ everything for your class trip? – Not yet.", note: "Station 2/3" },
+    { id: 32, de: "beißen", answer: "bite", sentence: "Does your dog ________? It looks a bit scary!", note: "Station 2/3" },
+    { id: 33, de: "jmdm. Angst machen; jmdn. erschrecken", answer: "scared", sentence: "I ________ my mum with a fake spider! She was sooo angry.", note: "Station 2/3" },
+    { id: 34, de: "weg", answer: "away", sentence: "Please don't go ________. I want to talk to you.", note: "Station 2/3" },
+    { id: 35, de: "Mal", answer: "times", sentence: "Have you ever played this game? – Yes, many ________.", note: "Station 2/3" },
+    { id: 36, de: "motivierend", answer: "motivating", sentence: "Start with positive feedback first, that's more ________.", note: "Station 2/3" },
+    { id: 37, de: "Pappe", answer: "cardboard", sentence: "Don't use normal paper, use ________. It's stronger.", note: "Station 2/3" },
+    { id: 38, de: "Schild; Zeichen", answer: "sign", sentence: "Can you read the ________ over there? – No, I can't. It's too far away.", note: "Station 2/3" },
+    { id: 39, de: "Einführung; Einleitung; Vorstellung", answer: "introduction", sentence: "The ________ of a presentation = the first part of a presentation.", note: "Station 2/3" },
+    { id: 40, de: "klar; deutlich", answer: "clearly", sentence: "For presentations you need to speak ________.", note: "Station 2/3" },
+
+    // Station 3
+    { id: 41, de: "als", answer: "as", sentence: "I want a fluffy animal ________ my pet.", note: "Station 3" },
+    { id: 42, de: "jmdn. vorstellen", answer: "introduce", sentence: "Let me ________ you to my friend Nick: Nick, this is Sarah.", note: "Station 3" },
+    { id: 43, de: "Schlange", answer: "snake", sentence: "Do you know if a ________ and a tarantula can live together in the same terrarium?", note: "Station 3" },
+    { id: 44, de: "wild", answer: "wild", sentence: "Pets – farm animals – ________ animals", note: "Station 3" },
+    { id: 45, de: "sich um jmdn./etw. kümmern; für jmdn. sorgen", answer: "took care of", sentence: "While my cousin was on holiday, I ________ his cats.", note: "Station 3" },
+    { id: 46, de: "keine Ahnung", answer: "no idea", sentence: "Which is the right way to the museum? – Sorry, I have ________, I'm not from here.", note: "Station 3" },
+    { id: 47, de: "Kommentar", answer: "comments", sentence: "This is a real problem, so I don't need your funny ________, Ruby.", note: "Station 3" },
+    { id: 48, de: "prüfen; abchecken; auschecken", answer: "check", sentence: "I heard there's a cool new second-hand shop in Greenwich Market, let's ________ it out.", note: "Station 3" }
+  ];
+
+  function shuffle(arr){
+    for(let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  const GOAL = ITEMS.length;
+  const STORAGE_KEY = "vocabulary_gap_trainer_station_1_3_strict_v3";
+
+  const dewordEl = document.getElementById("deword");
+  const sentenceEl = document.getElementById("sentence");
+  const subqEl = document.getElementById("subq");
+  const hintBox = document.getElementById("hintBox");
+  const aEl = document.getElementById("answer");
+  const fEl = document.getElementById("feedback");
+  const sEl = document.getElementById("status");
+  const progressText = document.getElementById("progressText");
+  const progressNums = document.getElementById("progressNums");
+  const reviewinfo = document.getElementById("reviewinfo");
+  const qnEl = document.getElementById("qnum");
+  const barEl = document.getElementById("bar");
+  const bankBox = document.getElementById("bankBox");
+
+  const btnCheck = document.getElementById("btnCheck");
+  const btnShow = document.getElementById("btnShow");
+  const btnNext = document.getElementById("btnNext");
+  const btnSkip = document.getElementById("btnSkip");
+  const btnStatus = document.getElementById("btnStatus");
+  const btnRestart = document.getElementById("btnRestart");
+
+  const byId = (id) => ITEMS.find(x => x.id === id);
+
+  function norm(s){
+    return (s || "")
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[’]/g, "'")
+      .replace(/\s+/g, " ");
+  }
+
+  function defaultState(){
+    const ids = ITEMS.map(it => it.id);
+    return {
+      statusById: Object.fromEntries(ids.map(id => [id, 0])),
+      mainQueue: shuffle([...ids]),
+      reviewQueue: [],
+      reviewDueAt: {},
+      step: 0,
+      currentId: null,
+      currentMode: "unanswered",
+      finished: false
+    };
+  }
+
+  function loadState(){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      const parsed = JSON.parse(raw);
+      if(!parsed || !parsed.statusById) return null;
+      return parsed;
+    } catch {
+      return null;
+    }
+  }
+
+  let state = loadState() || defaultState();
+
+  function saveState(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  function countSolved(){
+    return Object.values(state.statusById).filter(x => x === 1).length;
+  }
+
+  function countWrongOpen(){
+    return Object.values(state.statusById).filter(x => x === 2).length;
+  }
+
+  function updateHeader(){
+    const solved = countSolved();
+    const wrongOpen = countWrongOpen();
+    const percent = Math.round((solved / GOAL) * 100);
+
+    progressText.textContent = `Fortschritt: ${percent}%`;
+    progressNums.textContent = `${solved}/${GOAL} Aufgaben richtig`;
+    reviewinfo.textContent = wrongOpen ? `Wiederholung offen: ${wrongOpen}` : "";
+    qnEl.textContent = state.currentId ? `Frage: ${state.step}` : "";
+    barEl.style.width = `${Math.min(100, (solved / GOAL) * 100)}%`;
+  }
+
+  function renderStatus(){
+    const solved = countSolved();
+    const rows = ITEMS.map(it => {
+      const st = state.statusById[it.id];
+      const label = st === 1 ? "richtig" : (st === 2 ? "wiederholen" : "offen");
+      return `${String(it.id).padEnd(3)} | ${it.answer.padEnd(20)} | ${label}`;
+    }).join("\n");
+
+    sEl.textContent =
+      `STATUS\n------\nRichtig: ${solved}/${GOAL}\n\n` +
+      `ID  | ENGLISCH             | STATUS\n` +
+      `--------------------------------------\n` +
+      rows;
+  }
+
+  function enqueueReview(id){
+    const due = state.step + 5;
+    state.reviewDueAt[id] = Math.max(state.reviewDueAt[id] || 0, due);
+    if(!state.reviewQueue.includes(id)) state.reviewQueue.push(id);
+    state.statusById[id] = 2;
+  }
+
+  function removeFromReviewIfSolved(id){
+    state.reviewQueue = state.reviewQueue.filter(x => x !== id);
+    delete state.reviewDueAt[id];
+  }
+
+  function pickNextId(){
+    const due = state.reviewQueue.filter(id => (state.reviewDueAt[id] ?? 0) <= state.step);
+    if(due.length) return due[Math.floor(Math.random() * due.length)];
+
+    while(state.mainQueue.length){
+      const id = state.mainQueue.shift();
+      if(state.statusById[id] !== 1) return id;
+    }
+
+    if(state.reviewQueue.length){
+      let bestDue = Infinity;
+      for(const id of state.reviewQueue){
+        bestDue = Math.min(bestDue, state.reviewDueAt[id] ?? Infinity);
+      }
+      const best = state.reviewQueue.filter(id => (state.reviewDueAt[id] ?? Infinity) === bestDue);
+      return best[Math.floor(Math.random() * best.length)];
+    }
+
+    return null;
+  }
+
+  function renderQuestion(){
+    const next = pickNextId();
+
+    if(next === null){
+      state.finished = true;
+      dewordEl.innerHTML = `Fertig! <span class="ok">Alles geschafft.</span>`;
+      sentenceEl.textContent = "";
+      subqEl.textContent = "";
+      hintBox.textContent = "";
+      aEl.value = "";
+      aEl.disabled = true;
+      btnCheck.disabled = true;
+      btnShow.disabled = true;
+      btnNext.disabled = true;
+      btnSkip.disabled = true;
+      fEl.innerHTML = `<span class="ok">Du hast alle Aufgaben erledigt.</span>`;
+      updateHeader();
+      renderStatus();
+      saveState();
+      return;
+    }
+
+    state.currentId = next;
+    state.step += 1;
+    state.currentMode = "unanswered";
+
+    const it = byId(next);
+
+    dewordEl.textContent = it.de;
+    sentenceEl.textContent = it.sentence;
+    subqEl.textContent = it.note;
+    hintBox.textContent = "Gib das fehlende englische Wort oder die fehlende Wendung in der passenden Form ein.";
+
+    aEl.value = "";
+    aEl.disabled = false;
+    btnCheck.disabled = false;
+    btnShow.disabled = false;
+    btnSkip.disabled = false;
+    btnNext.disabled = true;
+
+    fEl.innerHTML = `<span class="muted">Schreibe das passende englische Wort.</span>`;
+
+    updateHeader();
+    renderStatus();
+    saveState();
+    aEl.focus();
+  }
+
+  btnCheck.addEventListener("click", () => {
+    if(state.finished || !state.currentId) return;
+
+    const it = byId(state.currentId);
+    const user = norm(aEl.value);
+    const correct = norm(it.answer);
+
+    if(user === correct){
+      state.statusById[it.id] = 1;
+      removeFromReviewIfSolved(it.id);
+      fEl.innerHTML = `<span class="ok">Richtig!</span>`;
+    } else {
+      enqueueReview(it.id);
+      fEl.innerHTML = `<span class="bad">Falsch.</span> <span class="pill">Wiederholung nach ≥ 5 Fragen</span>`;
+    }
+
+    state.currentMode = "checked";
+    btnNext.disabled = false;
+    updateHeader();
+    renderStatus();
+    saveState();
+  });
+
+  btnShow.addEventListener("click", () => {
+    if(state.finished || !state.currentId) return;
+    const it = byId(state.currentId);
+
+    enqueueReview(it.id);
+    state.currentMode = "shown";
+
+    fEl.innerHTML = `<div class="warn"><b>Lösung:</b> ${it.answer}</div>`;
+    aEl.disabled = true;
+    btnCheck.disabled = true;
+    btnNext.disabled = false;
+
+    updateHeader();
+    renderStatus();
+    saveState();
+  });
+
+  btnSkip.addEventListener("click", () => {
+    if(state.finished || !state.currentId) return;
+    const it = byId(state.currentId);
+
+    enqueueReview(it.id);
+    state.currentMode = "checked";
+
+    fEl.innerHTML = `<span class="bad">Übersprungen.</span> <span class="pill">Wiederholung nach ≥ 5 Fragen</span>`;
+    btnNext.disabled = false;
+
+    updateHeader();
+    renderStatus();
+    saveState();
+  });
+
+  btnNext.addEventListener("click", () => {
+    if(state.finished) return;
+    renderQuestion();
+  });
+
+  btnStatus.addEventListener("click", renderStatus);
+
+  btnRestart.addEventListener("click", () => {
+    localStorage.removeItem(STORAGE_KEY);
+    state = defaultState();
+
+    aEl.disabled = false;
+    btnCheck.disabled = false;
+    btnShow.disabled = false;
+    btnSkip.disabled = false;
+    btnNext.disabled = true;
+
+    fEl.innerHTML = `<span class="muted">Alles zurückgesetzt. Startet neu…</span>`;
+    sEl.textContent = "";
+
+    renderQuestion();
+  });
+
+  aEl.addEventListener("keydown", (e) => {
+    if(e.key === "Enter") btnCheck.click();
+  });
+
+  bankBox.innerHTML = ITEMS
+    .map(it => `<div class="bankitem"><b>${it.answer}</b> — ${it.de}</div>`)
+    .join("");
+
+  updateHeader();
+  renderStatus();
+  renderQuestion();
+});
+</script>
+</body>
+</html>
